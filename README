@@ -1,0 +1,24 @@
+cryptod is a program that listens on a TCP port or unix socket, receives
+information on that port, and performs the requested action. Common
+actions are aes256 encrypting/decrypting, base64 encoding/decoding,
+and RMD160 hashing. Interfacing with the daemon is well documented,
+and you are also easily able to obtain statistics from the server.
+
+It is multi-threaded, can handle thousands of simultaneous connections, and
+is Valgrind clean even after millions of transactions.
+
+* To compile:
+gcc -Wall -lc -Wextra -lcrypto -lpthread -lm -o cryptod crypto_server.c
+
+* To run:
+./cryptod -p 9997 -k /dev/random
+
+* To encrypt:
+printf "[ENCRYPT]\r\nHello, this is a test.\r\n.\r\n" | netcat localhost 9997
+
+* To decrypt:
+printf "[DECRYPT]\r\n<ENCRYPTED_TEXT>\r\n.\r\n" | netcat localhost 9997
+
+* To use a typical daemon config:
+dd if=/dev/random of=cryptod_secret_key.bin bs=1 count=1024
+cryptod -u nobody -w -k cryptod_secret_key.bin -p 9997 -s
